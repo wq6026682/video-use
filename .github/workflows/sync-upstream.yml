@@ -1,0 +1,27 @@
+name: Sync Upstream
+
+on:
+  schedule:
+    - cron: '57 3 * * *'  # 每天 3:57 UTC
+  workflow_dispatch:       # 手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/browser-use/video-use.git
+          git fetch upstream
+      
+      - name: Merge upstream
+        run: |
+          git merge upstream/main --no-edit || echo "No changes or merge conflict"
+      
+      - name: Push to fork
+        run: |
+          git push origin main
